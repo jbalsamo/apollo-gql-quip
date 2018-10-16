@@ -14,80 +14,102 @@ app.use(cors())
 const homePath = '/graphiql'
 const URL = 'http://localhost'
 const PORT = 3001
-const MONGO_URL = 'mongodb://localhost:27017/blog'
-
-
+//const MONGO_URL = 'mongodb://localhost:27017/blog'
+const MONGO_URL = 'mongodb://nexi-bmi.uhmc.sunysb.edu:27017/quip'
+var db;
 
 export const start = async () => {
   try {
-    const db = await MongoClient.connect(MONGO_URL)
+    db = await MongoClient.connect(MONGO_URL)
 
-    const Posts = db.collection('posts')
-    const Comments = db.collection('comments')
+    const Objects = db.collection("objects")
+    
+    Objects.find({ 'provenance.analysis.execution_id' : "seg:r1:w0.8:l3:u10:k20:j0", 'randval': {$gte:0},"provenance.image.case_id": "TCGA-MV-A51V-01Z-00-DX1" }).count().then(console.log)
 
     const typeDefs = [`
       type Query {
-        post(_id: String): Post
-        posts: [Post]
-        comment(_id: String): Comment
+        objectsByExecID(execution_id: String, case_id: String): [Object]
+        allObjects: [Object]
       }
 
-      type Post {
-        _id: String
-        title: String
-        content: String
-        comments: [Comment]
+      type Coordinate {
+        xyarr: [Float]
       }
 
-      type Comment {
-        _id: String
-        postId: String
-        content: String
-        post: Post
+      type Coordinates {
+        coordinateArr: [Coordinate]
       }
 
-      type Mutation {
-        createPost(title: String, content: String): Post
-        createComment(postId: String, content: String): Comment
+      type Geometry {
+        type: String
+        coordinates: [Coordinates]
+      }
+
+      type NV {
+        name: String
+        value: Float
+      }
+
+      type Scalar_Features {
+        ns: String
+        nv: [NV]
+      }
+
+      type Properties {
+        scalar_features: [Scalar_Features]
+      }
+
+      type Analysis {
+        execution_id: String
+        study_id: String
+        source: String
+        computation: String
+      }
+
+      type Image {
+        case_id: String
+        subject_id: String
+      }
+
+      type Provenance {
+        image: Image
+        analysis: Analysis
+        data_loader: String
+        batch_id: String
+        tag_id: String
+      }
+
+      type Object {
+        _id: ID
+        type: String
+        parent_id: String
+        randval: Float
+        creation_date: String
+        object_type: String
+        x: Float
+        y: Float
+        normalized: Boolean
+        bbox: [Float]
+        geometry: Geometry
+        footprint: Int
+        properties: Properties
+        provenance: Provenance
+        submit_date: String
       }
 
       schema {
         query: Query
-        mutation: Mutation
       }
     `];
 
     const resolvers = {
       Query: {
-        post: async (root, {_id}) => {
-          return prepare(await Posts.findOne(ObjectId(_id)))
+        objectsByExecID: async (root, execution_id,case_id) => {
+          return (await Objects.find({ 'randval': {$gte:0}, 'provenance.analysis.execution_id' : execution_id, "provenance.image.case_id": case_id }).limit(1000).toArray()).map(prepare);
         },
-        posts: async () => {
-          return (await Posts.find({}).toArray()).map(prepare)
-        },
-        comment: async (root, {_id}) => {
-          return prepare(await Comments.findOne(ObjectId(_id)))
-        },
-      },
-      Post: {
-        comments: async ({_id}) => {
-          return (await Comments.find({postId: _id}).toArray()).map(prepare)
+        allObjects: async () => {
+          return (await Objects.find({}).limit(1000).toArray()).map(prepare);
         }
-      },
-      Comment: {
-        post: async ({postId}) => {
-          return prepare(await Posts.findOne(ObjectId(postId)))
-        }
-      },
-      Mutation: {
-        createPost: async (root, args, context, info) => {
-          const res = await Posts.insertOne(args)
-          return prepare(res.ops[0])  // https://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~insertOneWriteOpResult
-        },
-        createComment: async (root, args) => {
-          const res = await Comments.insert(args)
-          return prepare(await Comments.findOne({_id: res.insertedIds[1]}))
-        },
       },
     }
 
