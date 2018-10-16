@@ -104,11 +104,11 @@ export const start = async () => {
 
     const resolvers = {
       Query: {
-        objectsByExecID: async (root, execution_id,case_id) => {
-          return (await Objects.find({ 'randval': {$gte:0}, 'provenance.analysis.execution_id' : execution_id, "provenance.image.case_id": case_id }).limit(1000).toArray()).map(prepare);
+        objectsByExecID: async (root, execution_id, case_id) => {
+          return (await Objects.find({ "randval": {$gte:0}, "provenance.analysis.source":"computer", "provenance.analysis.execution_id" : execution_id, "provenance.image.case_id": case_id }).limit(1000).toArray());
         },
         allObjects: async () => {
-          return (await Objects.find({}).limit(1000).toArray()).map(prepare);
+          return (await Objects.find({ "randval": {$gte:0},"provenance.analysis.source":"computer" }).limit(1000).toArray()).map(prepare);
         }
       },
     }
