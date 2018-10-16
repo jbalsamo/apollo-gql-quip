@@ -1,4 +1,4 @@
-# GraphQL-MongoDB-Example
+# Apollo Quip test for GraphQL
 
 All the important code is in `src/start.js`.
 
