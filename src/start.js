@@ -24,8 +24,6 @@ export const start = async () => {
 
     const Objects = db.collection("objects")
     
-    Objects.find({ 'provenance.analysis.execution_id' : "seg:r1:w0.8:l3:u10:k20:j0", 'randval': {$gte:0},"provenance.image.case_id": "TCGA-MV-A51V-01Z-00-DX1" }).count().then(console.log)
-
     const typeDefs = [`
       type Query {
         objectsByExecID(execution_id: String, case_id: String): [Object]
@@ -104,8 +102,8 @@ export const start = async () => {
 
     const resolvers = {
       Query: {
-        objectsByExecID: async (root, execution_id, case_id) => {
-          return (await Objects.find({ "randval": {$gte:0}, "provenance.analysis.source":"computer", "provenance.analysis.execution_id" : execution_id, "provenance.image.case_id": case_id }).limit(1000).toArray()).map(console.log);
+        objectsByExecID: async (root, args) => {
+          return (await Objects.find({ "randval": {$gte:0}, "provenance.analysis.source":"computer", "provenance.analysis.execution_id" : args.execution_id, "provenance.image.case_id": args.case_id }).limit(1000).toArray());
         },
         allObjects: async () => {
           return (await Objects.find({ "randval": {$gte:0},"provenance.analysis.source":"computer" }).limit(1000).toArray()).map(prepare);
