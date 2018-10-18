@@ -13,7 +13,7 @@ app.use(cors())
 
 const homePath = '/graphiql'
 const URL = 'http://localhost'
-const PORT = 3001
+const PORT = 8888
 //const MONGO_URL = 'mongodb://localhost:27017/blog'
 const MONGO_URL = 'mongodb://nexi-bmi.uhmc.sunysb.edu:27017/quip'
 var db;
