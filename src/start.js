@@ -78,7 +78,7 @@ export const start = async () => {
       }
 
       type Object {
-        _id: ID
+        _id: ID!
         type: String
         parent_id: String
         randval: Float
