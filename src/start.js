@@ -5,7 +5,7 @@ import {graphqlExpress, graphiqlExpress} from 'graphql-server-express'
 import {makeExecutableSchema} from 'graphql-tools'
 import cors from 'cors'
 import {prepare} from "../utill/index"
-
+import {clog, authQuip} from "./helpers"
 
 const app = express()
 
@@ -15,7 +15,7 @@ const homePath = '/graphiql'
 const URL = 'http://localhost'
 const PORT = 8888
 //const MONGO_URL = 'mongodb://localhost:27017/blog'
-const MONGO_URL = 'mongodb://nexi-bmi.uhmc.sunysb.edu:27017/quip'
+const MONGO_URL = 'mongodb://quip3.bmi.stonybrook.edu:27017/quip'
 var db;
 
 export const start = async () => {
@@ -26,7 +26,7 @@ export const start = async () => {
     
     const typeDefs = [`
       type Query {
-        objectsByExecID(execution_id: String, case_id: String, limit: Int): [Object]
+        objectsByExecID(token: String!, message: String, execution_id: String, case_id: String, limit: Int,): [Object]
         allObjects: [Object]
       }
 
@@ -103,7 +103,13 @@ export const start = async () => {
     const resolvers = {
       Query: {
         objectsByExecID: async (root, args) => {
-          return (await Objects.find({ "randval": {$gte:0}, "provenance.analysis.source":"computer", "provenance.analysis.execution_id" : args.execution_id, "provenance.image.case_id": args.case_id }).limit(args.limit).toArray());
+          var response;
+          if(authQuip(args.token,args.message)) {
+            clog(args.message);
+            return (await Objects.find({ "randval": {$gte:0}, "provenance.analysis.source":"computer", "provenance.analysis.execution_id" : args.execution_id, "provenance.image.case_id": args.case_id }).limit(args.limit).toArray());
+          } else {
+            throw("Authentication failure!");
+          }
         },
         allObjects: async () => {
           return (await Objects.find({ "randval": {$gte:0},"provenance.analysis.source":"computer" }).limit(1000).toArray()).map(prepare);
