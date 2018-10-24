@@ -1,32 +1,31 @@
-import {MongoClient, ObjectId} from 'mongodb'
-import express from 'express'
-import bodyParser from 'body-parser'
-import {graphqlExpress, graphiqlExpress} from 'graphql-server-express'
-import {makeExecutableSchema} from 'graphql-tools'
-import cors from 'cors'
-import {prepare} from "../utill/index"
-import {clog, authQuip} from "./helpers"
+import {MongoClient, ObjectId} from 'mongodb';
+import express from 'express';
+import bodyParser from 'body-parser';
+import { ApolloServer, gql } from 'apollo-server';
+import cors from 'cors';
+import {prepare} from "../utill/index";
+import {clog} from "./helpers";
 
-const app = express()
+const app = express();
 
-app.use(cors())
+app.use(cors());
 
-const homePath = '/graphiql'
-const URL = 'http://localhost'
-const PORT = 8888
+const homePath = '/graphiql';
+const URL = 'http://localhost';
+const PORT = 8888;
 //const MONGO_URL = 'mongodb://localhost:27017/blog'
-const MONGO_URL = 'mongodb://quip3.bmi.stonybrook.edu:27017/quip'
+const MONGO_URL = 'mongodb://quip3.bmi.stonybrook.edu:27017/quip';
 var db;
 
 export const start = async () => {
   try {
-    db = await MongoClient.connect(MONGO_URL)
+    db = await MongoClient.connect(MONGO_URL);
 
-    const Objects = db.collection("objects")
+    const Objects = db.collection("objects");
     
-    const typeDefs = [`
+     const typeDefs =gql`
       type Query {
-        objectsByExecID(token: String!, message: String, execution_id: String, case_id: String, limit: Int,): [Object]
+        objectsByExecID(msg:String,execution_id: String, case_id: String, limit: Int,): [Object]
         allObjects: [Object]
       }
 
@@ -78,7 +77,7 @@ export const start = async () => {
       }
 
       type Object {
-        _id: ID!
+        _id: String!
         type: String
         parent_id: String
         randval: Float
@@ -86,7 +85,7 @@ export const start = async () => {
         object_type: String
         x: Float
         y: Float
-        normalized: Boolean
+        normalized: String
         bbox: [Float]
         geometry: Geometry
         footprint: Int
@@ -98,44 +97,61 @@ export const start = async () => {
       schema {
         query: Query
       }
-    `];
+    `;
 
     const resolvers = {
       Query: {
         objectsByExecID: async (root, args) => {
-          var response;
-          if(authQuip(args.token,args.message)) {
-            clog(args.message);
-            return (await Objects.find({ "randval": {$gte:0}, "provenance.analysis.source":"computer", "provenance.analysis.execution_id" : args.execution_id, "provenance.image.case_id": args.case_id }).limit(args.limit).toArray());
+          const myQuery = {
+            "randval": {$gte:0},
+            "provenance.analysis.source":"computer", 
+            "provenance.analysis.execution_id" : args.execution_id, 
+            "provenance.image.case_id": args.case_id 
+          };
+          var results = await Objects.find(myQuery).limit(args.limit).toArray();
+          clog(args.msg);
+          // clog("Query Used: "+JSON.stringify(myQuery));
+          // clog(results);
+          if (typeof results != "undefined") {
+            // clog(results);
+            return(results.map(prepare));
           } else {
             throw("Authentication failure!");
-          }
+            return({'error': "Data missing"});
+          };
         },
         allObjects: async () => {
           return (await Objects.find({ "randval": {$gte:0},"provenance.analysis.source":"computer" }).limit(1000).toArray()).map(prepare);
         }
       },
-    }
+    };
 
-    const schema = makeExecutableSchema({
-      typeDefs,
-      resolvers
-    })
+    // const schema = makeExecutableSchema({
+    //   typeDefs,
+    //   resolvers,
+    //   context: ({ req }) => {
+    //     console.log("This is in the contect function")
+    //     // get the user token from the headers
+    //     const token = req.headers.get('Authorization') || 'graphiql';
+       
+    //     // try to retrieve a user with the token
+    //     const user = getUser(token);
+        
+    //     if (!user) throw new AuthorizationError('you must be logged in');
+       
+    //     // add the user to the context
+    //     return {user};
+    //   }
+    // });
 
+    const server =  new ApolloServer({typeDefs,resolvers});
 
-    app.use('/graphql', bodyParser.json(), graphqlExpress({schema}))
-
-
-    app.use(homePath, graphiqlExpress({
-      endpointURL: '/graphql'
-    }))
-
-    app.listen(PORT, () => {
-      console.log(`Visit ${URL}:${PORT}${homePath}`)
-    })
+    server.listen(PORT).then(({url}) => {
+      console.log(`🚀  Server ready at ${url}`);
+    });
 
   } catch (e) {
-    console.log(e)
-  }
+    console.log(e);
+  };
 
 }
