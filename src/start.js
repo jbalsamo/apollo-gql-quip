@@ -101,7 +101,7 @@ export const start = async () => {
 
     const resolvers = {
       Query: {
-        objectsByExecID: async (root, args) => {
+        objectsByExecID: async (root, args,context) => {
           const myQuery = {
             "randval": {$gte:0},
             "provenance.analysis.source":"computer", 
@@ -110,6 +110,7 @@ export const start = async () => {
           };
           var results = await Objects.find(myQuery).limit(args.limit).toArray();
           clog(args.msg);
+          clog(context.req.headers);
           // clog("Query Used: "+JSON.stringify(myQuery));
           // clog(results);
           if (typeof results != "undefined") {
@@ -144,7 +145,12 @@ export const start = async () => {
     //   }
     // });
 
-    const server =  new ApolloServer({typeDefs,resolvers});
+    const server =  new ApolloServer({
+      typeDefs,
+      resolvers,
+      context: ({ req }) => ({ req }),
+      engine: false
+    });
 
     server.listen(PORT).then(({url}) => {
       console.log(`🚀  Server ready at ${url}`);
