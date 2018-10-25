@@ -2,9 +2,6 @@ import {MongoClient} from 'mongodb';
 import { ApolloServer, gql } from 'apollo-server';
 import {prepare} from "../utill/index";
 import {clog, getUser, getToken} from "./helpers";
-import { split } from 'apollo-link';
-import { configure } from 'protobufjs';
-
 
 const homePath = '/graphiql';
 const URL = 'http://localhost';
