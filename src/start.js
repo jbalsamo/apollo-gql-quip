@@ -1,14 +1,10 @@
-import {MongoClient, ObjectId} from 'mongodb';
-import express from 'express';
-import bodyParser from 'body-parser';
+import {MongoClient} from 'mongodb';
 import { ApolloServer, gql } from 'apollo-server';
-import cors from 'cors';
 import {prepare} from "../utill/index";
-import {clog} from "./helpers";
+import {clog, getUser, getToken} from "./helpers";
+import { split } from 'apollo-link';
+import { configure } from 'protobufjs';
 
-const app = express();
-
-app.use(cors());
 
 const homePath = '/graphiql';
 const URL = 'http://localhost';
@@ -25,7 +21,7 @@ export const start = async () => {
     
      const typeDefs =gql`
       type Query {
-        objectsByExecID(msg:String,execution_id: String, case_id: String, limit: Int,): [Object]
+        objectsByExecID(execution_id: String, case_id: String, limit: Int,): [Object]
         allObjects: [Object]
       }
 
@@ -102,6 +98,8 @@ export const start = async () => {
     const resolvers = {
       Query: {
         objectsByExecID: async (root, args,context) => {
+          var token = null;
+          var user = null;
           const myQuery = {
             "randval": {$gte:0},
             "provenance.analysis.source":"computer", 
@@ -109,11 +107,11 @@ export const start = async () => {
             "provenance.image.case_id": args.case_id 
           };
           var results = await Objects.find(myQuery).limit(args.limit).toArray();
-          clog(args.msg);
-          clog(context.req.headers);
-          // clog("Query Used: "+JSON.stringify(myQuery));
-          // clog(results);
-          if (typeof results != "undefined") {
+          token = getToken(context.req.headers);
+          user = getUser(token);
+          clog({ 'user': user});
+          clog({'token':token});
+          if (typeof results != "undefined" && user.valid) {
             // clog(results);
             return(results.map(prepare));
           } else {

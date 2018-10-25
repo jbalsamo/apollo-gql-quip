@@ -12,22 +12,39 @@ export const authQuip = (tok,msg) => {
     }
 };
 
+export const getToken = (head) => {
+    var token = null;
+    if(typeof head.authorization != "undefined") {
+      var autharr = head.authorization.split(" ");
+      token = autharr[autharr.length-1];
+    }
+    return(token);
+};
+
 export const getUser = (tok) => {
-    user = null;
+    var userObj = {};
     switch(tok) {
-        case "qwerty12345":
-            user = "jbalsamo";
+        case "qwerty123456":
+            userObj.name = "jbalsamo";
+            userObj.role = "Jedi Knight";
+            userObj.valid = true;
             break;
-        case "asdfgh12345":
-            user = "ebremer";
+        case "asdfgh123456":
+            userObj.name = "ebremer";
+            userObj.role = "Sith Lord";
+            userObj.valid = true;
             break;
-        case "zxcvbn12345":
-            user = "tdiprima";
+        case "zxcvbn123456":
+            userObj.name = "tdiprima";
+            userObj.role = "Republic Senator";
+            userObj.valid = true;
             break;
         case "graphiql":
-            user = "graphiql";
+            userObj.name = "graphiql";
+            userObj.role = "droid";
+            userObj.valid = true;
             break;
         default:
     }
-    return ({ 'user': {'name':user,'role':"admin"}});
+    return (userObj);
 };
