@@ -16,7 +16,7 @@ export const start = async () => {
 
     const Objects = db.collection("objects");
     
-     const typeDefs =gql`
+    const typeDefs = gql`
       type Query {
         objectsByExecID(execution_id: String, case_id: String, limit: Int,): [Object]
         allObjects: [Object]
