@@ -1,3 +1,5 @@
+import { validate } from "graphql";
+
 export const clog = (s) => {
     console.log(s);
     return 0;
@@ -10,6 +12,10 @@ export const authQuip = (tok,msg) => {
     } else {
         return false;
     }
+};
+
+export const validateToken = (token) => {
+    
 };
 
 export const getToken = (head) => {
