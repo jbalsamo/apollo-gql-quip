@@ -1,5 +1,10 @@
 import { gql } from 'apollo-server';
+import { prepare } from '../../utill/index';
+import { MongoClient } from 'mongodb';
 
+/*---------------------------------------
+ *
+ */
 export const baseObject = gql`
 type Query {
   objectsByExecID(execution_id: String, case_id: String, limit: Int,): [Object]
@@ -56,7 +61,6 @@ type Object {
   normalized: String
   bbox: [Float]
   footprint: Int
-  geometry: Geometry
   properties: Properties
   provenance: Provenance
   submit_date: String
@@ -68,31 +72,31 @@ schema {
 `;
 
 export const objectResolvers = {
-    Query: {
-      objectsByExecID: async (root, args,context) => {
-        var token = null;
-        var user = null;
-        const myQuery = {
-          "randval": {$gte:0},
-          "provenance.analysis.source":"computer", 
-          "provenance.analysis.execution_id" : args.execution_id, 
-          "provenance.image.case_id": args.case_id 
-        };
-        var results = await Objects.find(myQuery).limit(args.limit).toArray();
-        token = getToken(context.req.headers);
-        user = getUser(token);
-        clog({ 'user': user});
-        clog({'token':token});
-        if (typeof results != "undefined" && user.valid) {
-          // clog(results);
-          return(results.map(prepare));
-        } else {
-          throw("Authentication failure!");
-          return({'error': "Data missing"});
-        };
-      },
-      allObjects: async () => {
-        return (await Objects.find({ "randval": {$gte:0},"provenance.analysis.source":"computer" }).limit(1000).toArray()).map(prepare);
-      }
+  Query: {
+    objectsByExecID: async (root, args, context) => {
+      let token = null;
+      let user = null;
+      const myQuery = {
+        randval: { $gte: 0 }, 
+        'provenance.analysis.source': 'computer', 
+        'provenance.analysis.execution_id' : args.execution_id, 
+        'provenance.image.case_id': args.case_id 
+      };
+      var results = await Objects.find(myQuery).limit(args.limit).toArray();
+      token = getToken(context.req.headers);
+      user = getUser(token);
+      clog({ 'user': user});
+      clog({'token':token});
+      if (typeof results != 'undefined' && user.valid) {
+        // clog(results);
+        return(results.map(prepare));
+      } else {
+        throw('Authentication failure!');
+        return({'error': 'Data missing'});
+      };
     },
-  };
+    allObjects: async () => {
+      return (await Objects.find({ randval: {$gte:0},'provenance.analysis.source': 'computer' }).limit(1000).toArray()).map(prepare);
+    }
+  },
+};
