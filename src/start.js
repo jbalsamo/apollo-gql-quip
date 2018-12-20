@@ -4,7 +4,6 @@ import { makeExecutableSchema } from 'graphql-tools';
 // import { clog, getUser, getToken } from "./helpers";
 import * as quipObject from './schemas/objects';
 
-// const URL = 'http://localhost';
 const PORT = 8888;
 // const MONGO_URL = 'mongodb://localhost:27017/blog'
 const MONGO_URL = 'mongodb://quip3.bmi.stonybrook.edu:27017/quip';

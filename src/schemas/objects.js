@@ -1,5 +1,6 @@
 /*----------------------------------------
  * @file Schema and resolvers for Quip 2.x data
+ * @module schemas/objects
  * @author Joseph Balsamo
  * @version 0.9.5
  *----------------------------------------*/
@@ -9,8 +10,8 @@ import { prepare } from '../../utill/index';
 import { getUser, getToken } from '../helpers';
 
 /*----------------------------------------
- *
- *
+ * @constant
+ * @type {GraphQLScalarType}
  *----------------------------------------*/
 const Coordinates = new GraphQLScalarType({
   name: 'Coordinates',
@@ -32,6 +33,10 @@ const Coordinates = new GraphQLScalarType({
   },
 });
 
+/*----------------------------------------
+ * @constant
+ * @type {GraphQLScalarType}
+ *----------------------------------------*/
 export const baseObject = gql`
 type Query {
   objectsByExecID(execution_id: String, case_id: String, limit: Int,): [Object]
@@ -102,6 +107,10 @@ schema {
 }
 `;
 
+/*----------------------------------------
+ * @constant
+ * @type {Object}
+ *----------------------------------------*/
 export const objectResolvers = {
   Query: {
     objectsByExecID: async (root, args, context) => {
