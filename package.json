@@ -30,7 +30,6 @@
     "graphql": "^14.0.2",
     "graphql-geojson": "^1.0.0",
     "graphql-tools": "4.0.3",
-    "jshint": "^2.9.7",
     "mongodb": "^2.2.15",
     "nodemon": "^1.18.3"
   }

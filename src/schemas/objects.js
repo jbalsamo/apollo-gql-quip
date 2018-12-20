@@ -1,23 +1,53 @@
+/*----------------------------------------
+ * @file Schema and resolvers for Quip 2.x data
+ * @author Joseph Balsamo
+ * @version 0.9.5
+ *----------------------------------------*/
 import { gql } from 'apollo-server';
+import { GraphQLScalarType } from 'graphql';
 import { prepare } from '../../utill/index';
-import { MongoClient } from 'mongodb';
+import { getUser, getToken } from '../helpers';
 
-/*---------------------------------------
+/*----------------------------------------
  *
- */
+ *
+ *----------------------------------------*/
+const Coordinates = new GraphQLScalarType({
+  name: 'Coordinates',
+  description: 'Coordinates for lines and Polygons in GeoJson format',
+  serialize(value) {
+    const result = value;
+    // Implement custom behavior by setting the 'result' variable
+    return result;
+  },
+  parseValue(value) {
+    const result = value;
+    // Implement custom behavior here by setting the 'result' variable
+    return result;
+  },
+  parseLiteral(ast) {
+    const result = ast.value;
+    return result;
+    // return a literal value, such as 1 or 'static string'
+  },
+});
+
 export const baseObject = gql`
 type Query {
   objectsByExecID(execution_id: String, case_id: String, limit: Int,): [Object]
   allObjects: [Object]
 }
 
-type NV {
-  name: String
-  value: Float
-}
+scalar Coordinates
 
 type Geometry {
   type: String
+  coordinates: Coordinates
+}
+
+type NV {
+  name: String
+  value: Float
 }
 
 type Scalar_Features {
@@ -60,6 +90,7 @@ type Object {
   y: Float
   normalized: String
   bbox: [Float]
+  geometry: Geometry
   footprint: Int
   properties: Properties
   provenance: Provenance
@@ -74,29 +105,30 @@ schema {
 export const objectResolvers = {
   Query: {
     objectsByExecID: async (root, args, context) => {
+      const Objects = context.db.collection('objects');
       let token = null;
       let user = null;
+      let retval = null;
+
       const myQuery = {
-        randval: { $gte: 0 }, 
-        'provenance.analysis.source': 'computer', 
-        'provenance.analysis.execution_id' : args.execution_id, 
-        'provenance.image.case_id': args.case_id 
+        randval: { $gte: 0 },
+        'provenance.analysis.source': 'computer',
+        'provenance.analysis.execution_id': args.execution_id,
+        'provenance.image.case_id': args.case_id,
       };
-      var results = await Objects.find(myQuery).limit(args.limit).toArray();
+      const results = await Objects.find(myQuery).limit(args.limit).toArray();
       token = getToken(context.req.headers);
       user = getUser(token);
-      clog({ 'user': user});
-      clog({'token':token});
-      if (typeof results != 'undefined' && user.valid) {
-        // clog(results);
-        return(results.map(prepare));
+      if (typeof results !== 'undefined' && user.valid) {
+        retval = results.map(prepare);
       } else {
-        throw('Authentication failure!');
-        return({'error': 'Data missing'});
-      };
+        retval = { error: 'Data missing' };
+      }
+      return retval;
     },
-    allObjects: async () => {
-      return (await Objects.find({ randval: {$gte:0},'provenance.analysis.source': 'computer' }).limit(1000).toArray()).map(prepare);
-    }
+    allObjects: async (root, _, context) => {
+      const Objects = context.db.collection('objects');
+      return (await Objects.find({ randval: { $gte: 0 }, 'provenance.analysis.source': 'computer' }).limit(1000).toArray()).map(prepare);
+    },
   },
 };
