@@ -1,61 +1,44 @@
-import {MongoClient} from 'mongodb';
-import { ApolloServer, gql } from 'apollo-server';
-import { mergeSchemas, makeExecutableSchema } from 'graphql-tools';
-import {prepare} from "../utill/index";
-import {clog, getUser, getToken} from "./helpers";
-import * as GeoJSON from 'graphql-geojson';
+import { MongoClient } from 'mongodb';
+import { ApolloServer } from 'apollo-server';
+import { makeExecutableSchema } from 'graphql-tools';
+// import { clog, getUser, getToken } from "./helpers";
 import * as quipObject from './schemas/objects';
 
-const URL = 'http://localhost';
 const PORT = 8888;
-//const MONGO_URL = 'mongodb://localhost:27017/blog'
+// const MONGO_URL = 'mongodb://localhost:27017/blog'
 const MONGO_URL = 'mongodb://quip3.bmi.stonybrook.edu:27017/quip';
-var db, Objects;
-
-const quipSchema = makeExecutableSchema({
-  typeDefs: quipObject.baseObject,
-  resolvers: quipObject.objectResolvers
-})
+let theSchema;
 
 
+const mySchema = async () => {
+  const quipSchema = await makeExecutableSchema({
+    typeDefs: [
+      quipObject.baseObject,
+    ],
+    resolvers: quipObject.objectResolvers,
+  });
 
-/* const linkSchema = makeExecutableSchema({
-  typeDefs: linkTypeDefs
-}) */
+  return (quipSchema);
+};
 
-const mySchema = mergeSchemas({
-  schemas: [
-    Object.values(GeoJSON), 
-    quipSchema
-  ]
+mySchema().then((x) => {
+  theSchema = x;
 });
-
-const workingSchema = mergeSchemas({
-  schemas: [
-    mySchema,
-    linkSchema
-  ]
-});
-
-
 
 export const start = async () => {
   try {
-    db = await MongoClient.connect(MONGO_URL);
+    const db = await MongoClient.connect(MONGO_URL);
 
-    Objects = db.collection("objects");
-
-    const server =  new ApolloServer({
-      schema: mySchema,
-      context: ({ req }) => ({ req }),
-      engine: false
+    const server = new ApolloServer({
+      schema: theSchema,
+      context: ({ req }) => ({ req, db }),
+      engine: false,
     });
 
-    server.listen(PORT).then(({url}) => {
+    server.listen(PORT).then(({ url }) => {
       console.log(`🚀  Server ready at ${url}`);
     });
-
   } catch (e) {
-   console.log(e);
-  };
-}
+    console.log(e);
+  }
+};
