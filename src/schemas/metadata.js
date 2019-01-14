@@ -17,4 +17,11 @@ export const metaObject = gql`
     type Query {
         
     }
+
+    type Metadata {
+        _id: String
+        color: String
+        title: String
+        
+    }
 `;
