@@ -18,10 +18,20 @@ export const metaObject = gql`
         
     }
 
+    type Provenance {
+        analysis_execution_id: String
+        study_id: String
+        type: String
+        algorithm_params: Algorithm_params
+    }
+    
     type Metadata {
         _id: String
         color: String
         title: String
-        
+        image: Image
+        provenance: Provenance
+        submit_date: String
+        randval: Float
     }
 `;
