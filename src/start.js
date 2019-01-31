@@ -1,6 +1,12 @@
-import { MongoClient } from 'mongodb';
-import { ApolloServer } from 'apollo-server';
-import { makeExecutableSchema } from 'graphql-tools';
+import {
+  MongoClient,
+} from 'mongodb';
+import {
+  ApolloServer,
+} from 'apollo-server';
+import {
+  makeExecutableSchema,
+} from 'graphql-tools';
 // import { clog, getUser, getToken } from "./helpers";
 import * as quipObject from './schemas/objects';
 
@@ -31,11 +37,18 @@ export const start = async () => {
 
     const server = new ApolloServer({
       schema: theSchema,
-      context: ({ req }) => ({ req, db }),
+      context: ({
+        req,
+      }) => ({
+        req,
+        db,
+      }),
       engine: false,
     });
 
-    server.listen(PORT).then(({ url }) => {
+    server.listen(PORT).then(({
+      url,
+    }) => {
       console.log(`🚀  Server ready at ${url}`);
     });
   } catch (e) {
