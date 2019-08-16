@@ -1,0 +1,289 @@
+schemas.txt
+--------------
+
+> db.analysis.findOne()
+{
+        "_id" : ObjectId("5d14dc59bd23f25620f2cfc0"),
+        "image" : {
+                "specimen" : "",
+                "slide" : "7",
+                "imageid" : "AALI-01Z-00-DX1",
+                "study" : "TCGA-BRCA",
+                "subject" : "TCGA-3C-AALI"
+        },
+        "analysis" : {
+                "execution_id" : "CNN_synthetic_n_real",
+                "type" : "computer",
+                "computation" : "segmentation",
+                "algorithm_params" : {
+                        "input_type" : "wsi",
+                        "otsu_ratio" : 0,
+                        "curvature_weight" : 0,
+                        "min_size" : 20,
+                        "max_size" : 65536,
+                        "ms_kernel" : 0,
+                        "declump_type" : 0,
+                        "levelset_num_iters" : 0,
+                        "mpp" : 0.25,
+                        "image_width" : 101184,
+                        "image_height" : 74432,
+                        "tile_width" : 4000,
+                        "tile_height" : 4000,
+                        "patch_width" : 4000,
+                        "patch_height" : 4000,
+                        "output_level" : "mask",
+                        "subject_id" : "TCGA-3C-AALI-01Z-00-DX1",
+                        "case_id" : "TCGA-3C-AALI-01Z-00-DX1",
+                        "analysis_id" : "CNN_synthetic_n_real",
+                        "analysis_desc" : "seg_0.33_0.07_200_20_65536"
+                },
+                "randval" : 0.9297495326773937,
+                "submit_date" : ISODate("2019-06-27T15:10:17.671Z")
+        }
+}
+
+
+> db.mark.findOne()
+{
+        "_id" : ObjectId("5d14dc59bd23f25620f2cf99"),
+        "properties" : {
+                "annotations" : {
+                        "AreaInPixels" : 34,
+                        "PhysicalSize" : 34,
+                        "ns" : "http://u24.bmi.stonybrook.edu/v1",
+                        "name" : "CNN_synthetic_n_real"
+                }
+        },
+        "geometries" : {
+                "type" : "FeatureCollection",
+                "features" : [
+                        {
+                                "type" : "Feature",
+                                "properties" : {
+                                        "style" : {
+                                                "color" : "#00fcfc",
+                                                "lineJoin" : "round",
+                                                "lineCap" : "round",
+                                                "isFill" : false
+                                        },
+                                        "nommp" : true
+                                },
+                                "geometry" : {
+                                        "type" : "Polygon",
+                                        "coordinates" : [
+                                                [
+                                                        [
+                                                                0.15638836179633145,
+                                                                0.16960447119518487
+                                                        ],
+                                                        [
+                                                                0.15637847881087918,
+                                                                0.16961790627687015
+                                                        ],
+                                                        [
+                                                                0.15637847881087918,
+                                                                0.16963134135855545
+                                                        ],
+                                                        [
+                                                                0.15636859582542695,
+                                                                0.16964477644024076
+                                                        ],
+                                                        [
+                                                                0.15636859582542695,
+                                                                0.16968508168529664
+                                                        ],
+                                                        [
+                                                                0.15639824478178369,
+                                                                0.16968508168529664
+                                                        ],
+                                                        [
+                                                                0.15640812776723592,
+                                                                0.16967164660361134
+                                                        ],
+                                                        [
+                                                                0.15640812776723592,
+                                                                0.16965821152192606
+                                                        ],
+                                                        [
+                                                                0.15641801075268819,
+                                                                0.16964477644024076
+                                                        ],
+                                                        [
+                                                                0.15641801075268819,
+                                                                0.16960447119518487
+                                                        ],
+                                                        [
+                                                                0.15638836179633145,
+                                                                0.16960447119518487
+                                                        ]
+                                                ]
+                                        ]
+                                },
+                                "bound" : {
+                                        "type" : "Polygon",
+                                        "coordinates" : [
+                                                [
+                                                        [
+                                                                0.15636859582542695,
+                                                                0.16960447119518487
+                                                        ],
+                                                        [
+                                                                0.15636859582542695,
+                                                                0.16968508168529664
+                                                        ],
+                                                        [
+                                                                0.15641801075268819,
+                                                                0.16968508168529664
+                                                        ],
+                                                        [
+                                                                0.15641801075268819,
+                                                                0.16960447119518487
+                                                        ],
+                                                        [
+                                                                0.15636859582542695,
+                                                                0.16960447119518487
+                                                        ]
+                                                ]
+                                        ]
+                                }
+                        }
+                ]
+        },
+        "footprint" : 34,
+        "parent_id" : "self",
+        "normalized" : "true",
+        "bbox" : [
+                0.15636859582542695,
+                0.16960447119518487,
+                0.15641801075268819,
+                0.16968508168529664
+        ],
+        "x" : 0.15639330328905757,
+        "y" : 0.16964477644024076,
+        "object_type" : "nucleus",
+        "randval" : 0.11902850693702427,
+        "provenance" : {
+                "image" : {
+                        "slide" : "7",
+                        "imageid" : "AALI-01Z-00-DX1",
+                        "study" : "TCGA-BRCA",
+                        "specimen" : "",
+                        "subject" : "TCGA-3C-AALI"
+                },
+                "analysis" : {
+                        "source" : "computer",
+                        "execution_id" : "CNN_synthetic_n_real",
+                        "name" : "CNN_synthetic_n_real",
+                        "computation" : "segmentation"
+                },
+                "data_loader" : "0.99",
+                "batch_id" : "b0",
+                "tag_id" : "t0"
+        }
+}
+
+
+> db.template.findOne()
+{
+        "_id" : "0",
+        "type" : "object",
+        "id" : "annotation-form",
+        "name" : "AnnotSchema",
+        "description" : "",
+        "links" : [ ],
+        "additionalProperties" : false,
+        "properties" : {
+                "name" : {
+                        "id" : "a0",
+                        "title" : "Identity Name",
+                        "type" : "string",
+                        "required" : true,
+                        "description" : "note name"
+                },
+                "notes" : {
+                        "id" : "a1",
+                        "title" : "Notes: ",
+                        "type" : "string",
+                        "format" : "textarea",
+                        "maxLength" : 128
+                }
+        }
+}
+
+> db.authorization.findOne()
+{
+        "_id" : ObjectId("5d14db29c10e5dd65756cad1"),
+        "name" : "admin@camicroscope.org",
+        "attrs" : [
+                "admin",
+                "write"
+        ]
+}
+
+> db.heatmap.findOne().provenance
+{
+        "image" : {
+                "subject_id" : "TCGA-3C-AALI",
+                "case_id" : "AALI-01Z-00-DX1",
+                "slide" : "7",
+                "specimen" : "",
+                "study" : ""
+        },
+        "analysis" : {
+                "study_id" : "TCGA-BRCA",
+                "computation" : "heatmap",
+                "size" : [
+                        0.0019765970904490615,
+                        0.0026870163370593114
+                ],
+                "fields" : [
+                        {
+                                "name" : "lym",
+                                "range" : [
+                                        0,
+                                        1
+                                ],
+                                "value" : [
+                                        0.1,
+                                        1
+                                ]
+                        },
+                        {
+                                "name" : "necrosis",
+                                "range" : [
+                                        0,
+                                        1
+                                ],
+                                "value" : [
+                                        0.1,
+                                        1
+                                ]
+                        }
+                ],
+                "execution_id" : "lym_incep_mix_prob-high_res",
+                "source" : "computer",
+                "setting" : {
+                        "mode" : "gradient",
+                        "field" : "lym"
+                }
+        }
+}
+
+> db.heatmap.findOne().data
+[
+  [
+          0.49613575268817206,
+          0.4621802450558899,
+          0.004895179532468319,
+          0
+  ],
+  .
+  .
+  .
+  [
+          0.49613575268817206,
+          0.47561532674118656,
+          0.000053309122449718416,
+          0
+  ]
+]

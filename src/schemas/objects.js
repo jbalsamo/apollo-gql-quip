@@ -137,7 +137,7 @@ export const objectResolvers = {
     },
     allObjects: async (root, _, context) => {
       const Objects = context.db.collection('objects');
-      return (await Objects.find({ randval: { $gte: 0 }, 'provenance.analysis.source': 'computer' }).limit(1000).toArray()).map(prepare);
+      return (await Objects.find({ randval: { $gte: 0 }, 'provenance.analysis.source': 'computer' }).limit(100000).toArray()).map(prepare);
     },
   },
 };
