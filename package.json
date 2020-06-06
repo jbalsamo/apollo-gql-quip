@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "apollo-server": "^2.1.0",
-    "apollo-server-express": "^0.4.3",
+    "apollo-server-express": "^2.14.2",
     "body-parser": "^1.15.2",
     "cors": "^2.8.1",
     "express": "^4.14.0",
